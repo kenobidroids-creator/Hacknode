@@ -2226,5 +2226,14 @@ function consumePivotIfActive() {
 
     // Apply persisted system name on boot
     setSysName(getSysName());
+    
+    // Allow login.js to hand off the operator name
+      window.bootIntoDesktop = function(profile) {
+          if (profile && profile.id) {
+              setSysName(profile.id);
+          } else {
+              setSysName(getSysName());
+          }
+      };
 
 }); // end DOMContentLoaded

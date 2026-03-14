@@ -1,0 +1,356 @@
+/* ============================================================
+   ABYSSAL OS — Login Screen Styles
+   Matches existing --bg-dark, --cyan, --pink, --grey tokens.
+   Appended to style.css or loaded as separate sheet.
+   ============================================================ */
+
+/* ── Screen container ─────────────────────────────────────── */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  color: #e0e0e0;
+}
+
+/* Scanline overlay on login */
+.ls-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 3px
+  );
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 1;
+  animation: ls-scanroll 12s linear infinite;
+}
+@keyframes ls-scanroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 300px; }
+}
+
+/* ── Boot log ─────────────────────────────────────────────── */
+.ls-boot-log {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 740px;
+  padding: 28px 32px 0;
+  flex-shrink: 0;
+}
+
+.ls-boot-line {
+  font-size: clamp(0.7rem, 1.5vw, 0.82rem);
+  color: #5a7a5a;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ls-boot-line.visible {
+  opacity: 1;
+  transform: none;
+}
+.ls-ok { color: #00f3ff; }
+
+/* ── ASCII Logo ───────────────────────────────────────────── */
+.ls-logo {
+  position: relative;
+  z-index: 2;
+  margin: 20px auto 0;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+.ls-logo.hidden { opacity: 0; pointer-events: none; }
+
+.ls-logo-line {
+  font-size: clamp(0.45rem, 1.1vw, 0.65rem);
+  line-height: 1.25;
+  color: #00f3ff;
+  text-shadow:
+    0 0 8px  rgba(0, 243, 255, 0.6),
+    0 0 20px rgba(0, 243, 255, 0.25);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: pre;
+  letter-spacing: 0.02em;
+}
+.ls-logo-line.visible {
+  opacity: 1;
+  transform: none;
+}
+/* Subtitle lines in the logo */
+.ls-logo-line:nth-last-child(-n+3) {
+  color: #5a7a7a;
+  text-shadow: none;
+  font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  letter-spacing: 0.15em;
+}
+
+/* ── Auth panel ───────────────────────────────────────────── */
+.ls-auth {
+  position: relative;
+  z-index: 2;
+  margin: 24px auto 0;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 32px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.ls-auth.hidden { display: none; }
+.ls-auth.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Returning operator */
+.ls-returning { }
+.ls-returning.hidden { display: none; }
+.ls-returning.visible { display: block; }
+
+.ls-auth-label {
+  font-size: 0.72rem;
+  color: #5a7a5a;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.ls-mt { margin-top: 14px; }
+
+.ls-typed-value {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: #00f3ff;
+  letter-spacing: 0.12em;
+  min-height: 1.4em;
+  text-shadow: 0 0 8px rgba(0,243,255,0.5);
+}
+
+.ls-auth-status {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  min-height: 1.2em;
+  transition: color 0.3s;
+}
+.ls-authenticating {
+  color: #f5a623;
+  animation: ls-blink-text 0.6s step-end infinite;
+}
+.ls-granted {
+  color: #7fff7f;
+  text-shadow: 0 0 10px rgba(127,255,127,0.4);
+}
+@keyframes ls-blink-text {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* New operator form */
+.ls-new { }
+.ls-new.hidden { display: none; }
+
+.ls-new-header {
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  color: #f5a623;
+  letter-spacing: 0.14em;
+  margin-bottom: 6px;
+}
+.ls-warn {
+  color: #ff003c;
+  margin-right: 6px;
+  animation: ls-blink-text 1s step-end infinite;
+}
+.ls-new-sub {
+  font-size: 0.76rem;
+  color: #5a7a5a;
+  letter-spacing: 0.08em;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.ls-field-wrap { margin-bottom: 18px; }
+.ls-field-label {
+  font-size: 0.7rem;
+  color: #5a7a5a;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+.ls-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #1a1a24;
+  border-bottom-color: #00f3ff;
+  padding: 8px 10px;
+  background: rgba(0,243,255,0.03);
+  transition: background 0.2s, border-color 0.2s;
+}
+.ls-input-row:focus-within {
+  background: rgba(0,243,255,0.06);
+  border-bottom-color: #00f3ff;
+  box-shadow: 0 2px 16px rgba(0,243,255,0.12);
+}
+.ls-prompt {
+  font-size: 0.75rem;
+  color: #5a7a5a;
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.ls-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #00f3ff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  letter-spacing: 0.14em;
+  caret-color: #00f3ff;
+  text-transform: uppercase;
+  min-width: 0;
+}
+.ls-input::placeholder {
+  color: #1e3a3a;
+  letter-spacing: 0.1em;
+}
+.ls-field-error {
+  font-size: 0.68rem;
+  color: #ff003c;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  min-height: 1em;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.ls-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 13px 24px;
+  margin-top: 8px;
+  background: transparent;
+  color: #00f3ff;
+  border: 1px solid #00f3ff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.88rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.ls-btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0,243,255,0.08), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+.ls-btn-primary:hover {
+  background: rgba(0,243,255,0.07);
+  box-shadow: 0 0 20px rgba(0,243,255,0.3);
+}
+.ls-btn-primary:hover::before { transform: translateX(100%); }
+.ls-btn-primary:active         { transform: translateY(1px); }
+.ls-btn-primary:focus-visible  { outline: 2px solid #00f3ff; outline-offset: 3px; }
+
+/* ── Blinking cursor ──────────────────────────────────────── */
+.ls-cursor {
+  display: inline-block;
+  animation: ls-blink-text 0.8s step-end infinite;
+  margin-left: 1px;
+}
+
+/* ── Skip button ──────────────────────────────────────────── */
+.ls-skip-wrap {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.4s;
+}
+.ls-skip-wrap.visible { opacity: 1; }
+.ls-skip-wrap.hidden  { display: none; }
+
+.ls-skip-btn {
+  background: transparent;
+  border: none;
+  color: #1e3a3a;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 6px 12px;
+}
+.ls-skip-btn:hover { color: #5a7a5a; }
+.ls-skip-btn:focus-visible { outline: 1px solid #5a7a5a; outline-offset: 4px; }
+
+/* ── Glitch exit animation ────────────────────────────────── */
+@keyframes ls-glitch {
+  0%   { transform: translate(0,0)       skewX(0deg);   filter: none; }
+  10%  { transform: translate(-3px, 1px) skewX(-1.5deg); filter: hue-rotate(60deg) brightness(1.4); }
+  20%  { transform: translate(3px,-1px)  skewX(1deg);    filter: none; }
+  30%  { transform: translate(-2px, 2px) skewX(0.5deg);  filter: hue-rotate(-30deg); }
+  40%  { transform: translate(0,0)        skewX(0deg);   filter: none; }
+  55%  { transform: translate(2px,-2px)  skewX(-1deg);   filter: brightness(1.6); }
+  70%  { transform: translate(-1px,1px); filter: none; }
+  85%  { transform: translate(1px,0);    filter: hue-rotate(90deg); }
+  100% { transform: translate(0,0);      filter: none; }
+}
+#login-screen.ls-glitch {
+  animation: ls-glitch 0.35s ease-out;
+}
+
+@keyframes ls-exit-sweep {
+  from { opacity: 1; transform: scaleY(1); }
+  50%  { opacity: 1; transform: scaleY(0.02); }
+  to   { opacity: 0; transform: scaleY(0); }
+}
+#login-screen.ls-exit {
+  transform-origin: center;
+  animation: ls-exit-sweep 0.6s ease-in forwards;
+}
+
+/* ── Desktop boot flash ───────────────────────────────────── */
+@keyframes desktop-boot-flash {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; filter: brightness(1.6); }
+  30%  { opacity: 0.6; filter: brightness(0.8); }
+  50%  { opacity: 1; filter: none; }
+  100% { opacity: 1; filter: none; }
+}
+#desktop.desktop-boot {
+  animation: desktop-boot-flash 0.7s ease-out forwards;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .ls-logo-line { font-size: 0.38rem; }
+  .ls-boot-log  { padding: 16px 16px 0; }
+  .ls-auth      { padding: 0 16px; }
+}
