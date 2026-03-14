@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <!-- LOGIN SCREEN — load before main styles so tokens exist -->
     <link rel="stylesheet" href="login.css">
+    <!-- HUB — desktop icons, cityscape, windows -->
+    <link rel="stylesheet" href="hub.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -47,10 +49,9 @@
         <div id="intel-tooltip" class="hidden"></div>
 
         <!-- ── MAP WINDOW ──────────────────────────────────── -->
-        <div id="win-map" class="window"
+        <div id="win-map" class="window hidden"
              data-closeable="true"
              data-tab-label="NETWORK_MAP"
-             data-icon="NETWORK_TOPOLOGY.exe"
              data-default-rel-x="0.03"
              data-default-rel-y="0.04"
              style="top: 50px; left: 30px;">
@@ -330,12 +331,107 @@
             </div>
         </div>
 
+        <!-- ── MESSAGES WINDOW ─────────────────────────────── -->
+        <div id="win-messages" class="window hidden"
+             data-closeable="true"
+             data-tab-label="MESSAGES.app"
+             data-default-rel-x="0.32"
+             data-default-rel-y="0.08"
+             style="top:60px;left:260px;width:520px;height:380px">
+            <div class="window-header">
+                <span class="win-title">MESSAGES.app</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div id="win-messages-content" style="flex:1;overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <!-- ── FRIEND STASH (Firefox 1.0) ──────────────────── -->
+        <div id="win-stash" class="window hidden"
+             data-closeable="true"
+             data-tab-label="FRIEND_STASH.lnk"
+             data-default-rel-x="0.2"
+             data-default-rel-y="0.1"
+             style="top:70px;left:160px;width:560px;height:460px">
+            <div class="window-header">
+                <span class="win-title">Mozilla Firefox 1.0</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div style="background:#c0c0c0;border-bottom:1px solid #808080;padding:3px 6px;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <button style="font-size:0.6rem;padding:1px 5px;background:#d4d0c8;border:1px outset #808080;cursor:pointer">◄</button>
+                <button style="font-size:0.6rem;padding:1px 5px;background:#d4d0c8;border:1px outset #808080;cursor:pointer">►</button>
+                <button style="font-size:0.6rem;padding:1px 5px;background:#d4d0c8;border:1px outset #808080;cursor:pointer">✕</button>
+                <div style="flex:1;background:#fff;border:1px inset #808080;padding:1px 6px;font-family:'Courier New',monospace;font-size:0.65rem;color:#000;white-space:nowrap;overflow:hidden;">
+                    http://friend.localhost/tools4u/index.html
+                </div>
+                <button style="font-size:0.6rem;padding:1px 8px;background:#d4d0c8;border:1px outset #808080;cursor:pointer">Go</button>
+            </div>
+            <div class="window-content" style="padding:0;overflow:hidden;">
+                <div id="win-stash-content" style="height:100%;overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <!-- ── LOADOUT WINDOW ──────────────────────────────── -->
+        <div id="win-loadout" class="window hidden"
+             data-closeable="true"
+             data-tab-label="LOADOUT.sys"
+             data-default-rel-x="0.28"
+             data-default-rel-y="0.08"
+             style="top:65px;left:220px;width:580px;height:400px">
+            <div class="window-header">
+                <span class="win-title">LOADOUT.sys</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div id="win-loadout-content" style="flex:1;overflow-y:auto;padding:10px 12px;"></div>
+            </div>
+        </div>
+
+        <!-- ── SERVERS WINDOW (stub) ───────────────────────── -->
+        <div id="win-servers" class="window hidden"
+             data-closeable="true"
+             data-tab-label="SERVERS.dat"
+             data-default-rel-x="0.35"
+             data-default-rel-y="0.1"
+             style="top:70px;left:280px;width:400px;height:300px">
+            <div class="window-header">
+                <span class="win-title">SERVERS.dat</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div style="color:rgba(224,224,224,0.3);font-size:0.75rem;padding:14px 16px;line-height:2;">
+                    // no passive servers active<br>
+                    // capture backdoors from node breaches to<br>
+                    // establish passive data streams<br><br>
+                    <span style="color:rgba(0,243,255,0.3)">SERVERS.dat — feature coming soon</span>
+                </div>
+            </div>
+        </div>
+
         <footer id="taskbar">
-            <div class="start-btn" onclick="openTerminal()">TERMINAL</div>
+            <!-- dynamically populated by script.js ensureTab -->
         </footer>
     </div>
-    <!-- SCRIPTS — login MUST come before script.js -->
+    <!-- SCRIPTS — login → hub → game (order matters) -->
     <script src="login.js"></script>
+    <script src="hub.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

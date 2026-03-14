@@ -29,11 +29,122 @@ body {
 #desktop {
     position: fixed;
     inset: 0;
-    background: #000;
     overflow: hidden;
+    /* ── Pixel cityscape — layered from back to front ── */
+    background-color: #000008;
+    background-image:
+        /* 1. Grid overlay — faint cyan lines */
+        repeating-linear-gradient(0deg,   transparent, transparent 39px, rgba(0,243,255,0.03) 39px, rgba(0,243,255,0.03) 40px),
+        repeating-linear-gradient(90deg,  transparent, transparent 39px, rgba(0,243,255,0.03) 39px, rgba(0,243,255,0.03) 40px),
+        /* 2. Ground-level fog */
+        linear-gradient(to top, rgba(0,12,24,0.92) 0%, transparent 18%),
+        /* 3. Near buildings — tallest, hard black silhouettes */
+        linear-gradient(to top, #000 0%, #000 26%, transparent 26.05%),
+        linear-gradient(to top, #000 0%, #000 31%, transparent 31.05%),
+        linear-gradient(to top, #000 0%, #000 22%, transparent 22.05%),
+        /* 4. Mid buildings — slightly lighter */
+        linear-gradient(to top, #000 0%, #050510 14%, transparent 14.05%),
+        linear-gradient(to top, #000 0%, #050510 17%, transparent 17.05%),
+        /* 5. Far buildings — dark blue-grey horizon */
+        linear-gradient(to top, #000 0%, #02080e 8%,  transparent  8.05%),
+        linear-gradient(to top, #000 0%, #010608 10%, transparent 10.05%),
+        /* 6. Sky — deep space gradient */
+        linear-gradient(to bottom, #000000 0%, #000614 40%, #001020 70%, #000810 100%);
+    background-size:
+        /* grid */    40px 40px, 40px 40px,
+        /* fog */     100% 100%,
+        /* near 1 */  18% 100%, /* near 2 */ 14% 100%, /* near 3 */ 22% 100%,
+        /* mid  1 */  30% 100%, /* mid  2 */ 25% 100%,
+        /* far  1 */  55% 100%, /* far  2 */ 40% 100%,
+        /* sky */     100% 100%;
+    background-position:
+        0 0, 0 0,
+        0 0,
+        82% 0, 10% 0, 65% 0,
+        35% 0, 58% 0,
+        20% 0, 70% 0,
+        0 0;
+    background-repeat: repeat, repeat,
+        no-repeat, no-repeat, no-repeat, no-repeat,
+        no-repeat, no-repeat, no-repeat, no-repeat,
+        no-repeat;
 }
 
-/* ── OS BARS ──────────────────────────────────────────────── */
+/* Neon window lights scattered across buildings */
+#desktop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle, rgba(0,243,255,0.55) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,0,80,0.45)  1px, transparent 1px),
+        radial-gradient(circle, rgba(0,243,255,0.40) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,210,0,0.45) 1px, transparent 1px),
+        radial-gradient(circle, rgba(0,243,255,0.50) 1px, transparent 1px),
+        radial-gradient(circle, rgba(200,0,255,0.35) 1px, transparent 1px),
+        radial-gradient(circle, rgba(0,243,255,0.30) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,0,80,0.30)  1px, transparent 1px),
+        radial-gradient(circle, rgba(255,210,0,0.35) 1px, transparent 1px);
+    background-size:
+        110px 55px, 85px 42px, 145px 60px,
+        75px  38px, 190px 65px, 100px 48px,
+        130px 52px, 95px  45px, 160px 58px;
+    background-position:
+        8%  62%,  22% 70%,  38% 58%,
+        54% 72%,  68% 60%,  81% 68%,
+        15% 78%,  48% 74%,  72% 76%;
+    background-repeat: repeat;
+    height: 40%;
+    top: auto;
+    bottom: 0;
+    opacity: 0.7;
+    animation: city-flicker 9s step-end infinite;
+}
+
+/* Horizon neon glow line */
+#desktop::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    left: 0; right: 0;
+    bottom: 26%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0,243,255,0.08) 15%,
+        rgba(0,243,255,0.25) 35%,
+        rgba(255,0,80,0.15) 50%,
+        rgba(0,243,255,0.25) 65%,
+        rgba(0,243,255,0.08) 85%,
+        transparent 100%);
+    box-shadow: 0 0 18px 2px rgba(0,243,255,0.12);
+}
+
+@keyframes city-flicker {
+    0%,100% { opacity: 0.70; }
+    8%       { opacity: 0.50; }
+    9%       { opacity: 0.72; }
+    41%      { opacity: 0.62; }
+    42%      { opacity: 0.74; }
+    67%      { opacity: 0.55; }
+    68%      { opacity: 0.70; }
+}
+
+/* Desktop boot flash */
+#desktop.desktop-boot {
+    animation: desktop-boot-flash 0.7s ease-out forwards;
+}
+@keyframes desktop-boot-flash {
+    0%   { opacity: 0; }
+    15%  { opacity: 1; filter: brightness(1.5); }
+    30%  { opacity: 0.7; }
+    100% { opacity: 1; filter: none; }
+}
+
+
 #os-top-bar {
     position: relative;
     height: var(--topbar-h);
@@ -576,13 +687,18 @@ body {
 /* ── DESKTOP ICONS ────────────────────────────────────────── */
 #desktop-icons {
     position: absolute;
-    /* sits in the work area, below the top bar */
     top: var(--topbar-h);
     left: 0;
     right: 0;
     bottom: var(--taskbar-h);
-    pointer-events: none; /* icons manage their own events */
-    z-index: 1;
+    pointer-events: none; /* container is pass-through */
+    z-index: 10; /* above cityscape, below windows */
+}
+
+/* Hub icons (.desk-icon) override pointer-events individually */
+.desk-icon {
+    pointer-events: all !important;
+    cursor: pointer !important;
 }
 
 .desktop-icon {

@@ -694,6 +694,11 @@ function breachSuccess() {
     if (node) { node.cleared = true; node.hp = 0; }
     if (ntype) state.runData += ntype.reward.data;
 
+    // Notify hub.js so mid-tutorial tool drops fire at the right moments
+    if (typeof window.hubOnNodeCleared === 'function') {
+        window.hubOnNodeCleared(state.nodesBreached - 1, state.nodes.length);
+    }
+
     // Unlock next reachable nodes
     state.reachable = computeReachable(state.currentNodeId);
 
@@ -872,7 +877,8 @@ function startNewRun() {
     state.opsecCharges   = { goDark: 1, logWipe: 1, pivot: 1 };
 
     updateGlobalUI();
-    generateWebMap();
+    // Sector launch now handled by hub.js loadout window after loadout confirmed.
+    // generateWebMap() is called from there via window.generateWebMap().
 }
 
 function useBurner() {
@@ -1485,7 +1491,7 @@ updateClock();setInterval(updateClock,1000);
 // ============================================================
 initWindows();
 initMapPan();
-generateWebMap();
+// generateWebMap() now called by hub.js after contract accepted + loadout confirmed
 updateGlobalUI();
 
 window.addEventListener('resize',()=>{
@@ -1571,6 +1577,8 @@ const TERM_COMMANDS = {
             termPrint('  whoami    — current operator profile', 't-dim');
             termPrint('  status    — run statistics', 't-dim');
             termPrint('  sysname   — rename this system', 't-dim');
+            termPrint('  wallpaper — desktop settings  (wallpaper --rain on/off)', 't-dim');
+            termPrint('  connect   — connect to remote server  (connect [ip])', 't-dim');
             termPrint('  clear     — clear terminal', 't-dim');
             termPrint('', 't-blank');
             termShowMainChips();
@@ -1613,6 +1621,26 @@ const TERM_COMMANDS = {
             termPrint('Allowed: A–Z, 0–9, _ and - · max 12 chars', 't-dim');
             termPrint('', 't-blank');
             termShowNameInput();
+        }
+    },
+    wallpaper: {
+        label: '> wallpaper',
+        title: 'Desktop settings',
+        run() {
+            termPrint('Usage: wallpaper --rain on|off', 't-dim');
+            termPrint('Controls the rain animation on the desktop.', 't-dim');
+            termPrint('', 't-blank');
+            termShowMainChips();
+        }
+    },
+    connect: {
+        label: '> connect',
+        title: 'Connect to remote server',
+        run() {
+            termPrint('Usage: connect [ip]', 't-dim');
+            termPrint('Find server addresses through your contacts.', 't-dim');
+            termPrint('', 't-blank');
+            termShowMainChips();
         }
     },
     clear: {
@@ -2223,17 +2251,23 @@ function consumePivotIfActive() {
     window.powerResetConfirm       = powerResetConfirm;
     window.powerResetCancel        = powerResetCancel;
     window.openTerminal            = openTerminal;
+    // Required by hub.js — these functions live inside DOMContentLoaded
+    // so they must be explicitly exposed for hub.js to call them
+    window.openWindow              = openWindow;
+    window.closeWindow             = closeWindow;
+    window.generateWebMap          = generateWebMap;
+    window.TOOL_DB                 = TOOL_DB;   // hub.js needs this for stash/loadout tool names
 
     // Apply persisted system name on boot
     setSysName(getSysName());
-    
-    // Allow login.js to hand off the operator name
-      window.bootIntoDesktop = function(profile) {
-          if (profile && profile.id) {
-              setSysName(profile.id);
-          } else {
-              setSysName(getSysName());
-          }
-      };
+
+    // bootIntoDesktop: hub.js registers the real handler before DOMContentLoaded
+    // fires (hub.js loads first in the script order). This is a safe fallback.
+    if (typeof window.bootIntoDesktop !== 'function') {
+        window.bootIntoDesktop = function(profile) {
+            if (profile && profile.id) setSysName(profile.id);
+            else setSysName(getSysName());
+        };
+    }
 
 }); // end DOMContentLoaded
