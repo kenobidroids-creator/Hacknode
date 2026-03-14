@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Abyssal OS // KERNEL_v0.7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="desktop">
+        <div class="crt-overlay"></div>
+
+        <header id="os-top-bar">
+            <div class="sys-logo sys-name-label">SYS_ABYSSAL</div>
+            <div id="os-top-stats">
+                <button id="opsec-topbtn" onclick="openOpsecConsole()" title="Open OPSEC console">OPSEC ▼</button>
+                <span class="top-stat-label">TRACE</span>
+                <span id="global-trace" class="top-stat-val warning">0/20</span>
+                <span class="top-stat-sep">|</span>
+                <span class="top-stat-label">DATA</span>
+                <span id="run-data-global" class="top-stat-val">0</span>
+                <span class="top-stat-sep">|</span>
+                <span class="top-stat-label">NODES</span>
+                <span id="nodes-breached" class="top-stat-val">0</span>
+                <span class="top-stat-sep">|</span>
+                <span id="player-tier" class="top-stat-tier">Script Kiddie</span>
+            </div>
+            <div id="os-clock">00:00:00</div>
+            <!-- Power menu button -->
+            <div id="power-btn-wrap">
+                <button id="power-btn" onclick="togglePowerMenu()" title="System menu" aria-label="System menu">PWR</button>
+                <div id="power-menu" class="hidden">
+                    <div id="pm-main">
+                        <button onclick="powerSave()">💾 Save Run</button>
+                        <button id="pm-load" onclick="powerLoad()">📂 Load Run</button>
+                        <div class="pm-divider"></div>
+                        <button onclick="powerReset()" class="pm-danger">↺ Reset Run</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="desktop-icons"></div>
+        <div id="intel-tooltip" class="hidden"></div>
+
+        <!-- ── MAP WINDOW ──────────────────────────────────── -->
+        <div id="win-map" class="window"
+             data-closeable="true"
+             data-tab-label="NETWORK_MAP"
+             data-icon="NETWORK_TOPOLOGY.exe"
+             data-default-rel-x="0.03"
+             data-default-rel-y="0.04"
+             style="top: 50px; left: 30px;">
+            <div class="window-header">
+                <span class="win-title">NETWORK_TOPOLOGY.exe</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content map-bg">
+                <div id="map-wrapper">
+                    <svg id="map-connections"></svg>
+                    <div id="node-layer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BREACH CONSOLE ──────────────────────────────── -->
+        <div id="win-breach" class="window hidden"
+             data-closeable="false"
+             data-tab-label="BREACH_CONSOLE"
+             data-default-rel-x="0.55"
+             data-default-rel-y="0.04"
+             style="top: 60px; left: 10px;">
+            <div class="window-header">
+                <span class="win-title">BREACH_CONSOLE.bin</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content breach-layout">
+
+                <!-- Trace bar -->
+                <div class="breach-trace-bar-row">
+                    <span class="bstat-label">TRACE LEVEL</span>
+                    <div class="breach-bar-wrap"><div id="trace-bar" class="breach-bar trace-b"></div></div>
+                    <span id="trace-val" class="bstat-val warning">0/20</span>
+                </div>
+
+                <!-- Phase track + skip button -->
+                <div class="phase-track-wrap">
+                    <div id="phase-track" class="phase-track"></div>
+                    <button id="btn-skip-phase" class="phase-skip-btn" onclick="skipPhase()" title="Skip to next phase (+2 trace)">SKIP →</button>
+                </div>
+
+                <!-- Target + actions -->
+                <div class="breach-mid">
+                    <div class="target-panel">
+                        <div class="target-header">
+                            <span id="target-icon-el" class="target-icon">⬡</span>
+                            <div>
+                                <div id="target-name" class="target-name">—</div>
+                                <div id="target-soft" class="target-soft">—</div>
+                                <div id="target-cve"  class="target-cve">—</div>
+                            </div>
+                        </div>
+                        <div class="fw-bar-wrap"><div id="firewall-bar" class="breach-bar fw-b"></div></div>
+                        <div class="fw-nums"><span id="firewall-val">0</span> / <span id="target-fwall-max">0</span></div>
+                        <div class="target-rows">
+                            <div class="trow">WEAK: <span id="target-weak" class="weak-tags">???</span></div>
+                            <div class="trow">DATA: <span id="breach-data-val" class="tval-cyan">0</span> &nbsp; STEALTH: <span id="breach-stealth-val" class="tval-cyan">0</span></div>
+                            <div class="trow">TOOLS: <span id="tools-used-list" class="tval-dim">—</span></div>
+                        </div>
+                        <div id="active-synergies" class="synergy-list"></div>
+                    </div>
+
+                    <div class="breach-actions">
+                        <button id="btn-end-turn" class="action-btn primary" onclick="endTurn()">END TURN ↩</button>
+                        <button id="btn-retreat"  class="action-btn danger"  onclick="retreat()">RETREAT</button>
+                        <button id="burner-btn"   class="action-btn burner"  onclick="useBurner()" style="display:none">🔥 BURN TRACE</button>
+                        <div class="deck-info">
+                            DECK: <span id="deck-count">0</span> &nbsp;|&nbsp; DISCARD: <span id="discard-count">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hand -->
+                <div class="hand-area">
+                    <div class="hand-label">YOUR TOOLS</div>
+                    <div id="hand"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── UPGRADE WINDOW ──────────────────────────────── -->
+        <div id="win-upgrade" class="window hidden"
+             data-closeable="false"
+             data-tab-label="UPGRADE_TERMINAL"
+             data-default-rel-x="0.25"
+             data-default-rel-y="0.08"
+             style="top: 70px; left: 200px;">
+            <div class="window-header">
+                <span class="win-title">UPGRADE_TERMINAL.sh</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content upgrade-layout">
+                <div class="upgrade-section-title">NODE COMPROMISED — SELECT PASSIVE UPGRADE</div>
+                <div id="upgrade-choices" class="upgrade-grid"></div>
+                <div class="upgrade-section-title" style="margin-top:14px;">ADD TOOL TO DECK</div>
+                <div id="tool-reward-choices" class="tool-reward-grid"></div>
+                <div class="upgrade-continue-row">
+                    <button class="action-btn primary" onclick="closeUpgradeAndContinue()">▶ CONTINUE TO MAP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── END SCREEN ──────────────────────────────────── -->
+
+        <!-- ── OPSEC CONSOLE ───────────────────────────────────── -->
+        <div id="win-opsec" class="window hidden"
+             data-closeable="true"
+             data-tab-label="OPSEC_CONSOLE"
+             data-default-rel-x="0.3"
+             data-default-rel-y="0.1"
+             style="top: 80px; left: 220px;">
+            <div class="window-header">
+                <span class="win-title">OPSEC_CONSOLE.sh</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content opsec-layout">
+                <div class="opsec-header">
+                    <span class="opsec-label">TRACE</span>
+                    <span id="opsec-trace-display" class="opsec-trace-val">0/20</span>
+                    <span class="opsec-label" style="margin-left:12px">DATA</span>
+                    <span id="opsec-data-display" class="opsec-trace-val">0</span>
+                </div>
+                <div class="opsec-options">
+                    <div class="opsec-card">
+                        <div class="opsec-card-header">
+                            <span class="opsec-icon">🌑</span>
+                            <div>
+                                <div class="opsec-title">GO DARK</div>
+                                <div class="opsec-subtitle">Disconnect 24h. Logs rotate. You disappear.</div>
+                            </div>
+                            <span class="opsec-charges" id="opsec-gd-charges">1</span>
+                        </div>
+                        <div class="opsec-effect">
+                            <span class="opsec-good">-3 Trace</span>
+                            <span class="opsec-bad">Nodes harden +10% HP · 50% chance intel decays</span>
+                        </div>
+                        <button class="opsec-btn" id="btn-go-dark" onclick="goDark()">EXECUTE</button>
+                        <div class="opsec-result" id="opsec-gd-result"></div>
+                    </div>
+                    <div class="opsec-card">
+                        <div class="opsec-card-header">
+                            <span class="opsec-icon">🗑</span>
+                            <div>
+                                <div class="opsec-title">LOG WIPE</div>
+                                <div class="opsec-subtitle">Find and clear breach logs before analysts see them.</div>
+                            </div>
+                            <span class="opsec-charges" id="opsec-lw-charges">1</span>
+                        </div>
+                        <div class="opsec-effect">
+                            <span class="opsec-good">Perfect: -5 Trace</span>
+                            <span class="opsec-bad">Partial: -2 + missed · False positives: +1 each</span>
+                        </div>
+                        <div id="opsec-lw-setup">
+                            <button class="opsec-btn" id="btn-log-wipe" onclick="startLogWipe()">START WIPE</button>
+                        </div>
+                        <div id="opsec-lw-game" style="display:none">
+                            <div class="log-wipe-hint">Click YOUR breach logs — avoid clean entries</div>
+                            <div class="log-wipe-timer-track"><div id="log-wipe-timer-bar" class="log-wipe-timer-bar"></div></div>
+                            <div id="log-wipe-entries" class="log-wipe-entries"></div>
+                        </div>
+                        <div class="opsec-result" id="opsec-lw-result"></div>
+                    </div>
+                    <div class="opsec-card">
+                        <div class="opsec-card-header">
+                            <span class="opsec-icon">🔀</span>
+                            <div>
+                                <div class="opsec-title">PIVOT ROUTE</div>
+                                <div class="opsec-subtitle">Re-route through a clean hop. Costs data.</div>
+                            </div>
+                            <span class="opsec-charges" id="opsec-pv-charges">1</span>
+                        </div>
+                        <div class="opsec-effect">
+                            <span class="opsec-good">Next breach: -1 trace/card · ½ ICE</span>
+                            <span class="opsec-bad">Cost: <span id="opsec-pv-cost">10</span> DATA</span>
+                        </div>
+                        <button class="opsec-btn" id="btn-pivot" onclick="pivot()">PURCHASE ROUTE</button>
+                        <div class="opsec-result" id="opsec-pv-result"></div>
+                    </div>
+                </div>
+                <div class="opsec-footer">
+                    <button class="action-btn primary" onclick="closeOpsecConsole()">▶ BACK TO MAP</button>
+                </div>
+            </div>
+        </div>
+        <div id="win-endscreen" class="window hidden"
+             data-closeable="false"
+             data-tab-label="RUN_COMPLETE"
+             data-default-rel-x="0.3"
+             data-default-rel-y="0.15"
+             style="top: 100px; left: 250px;">
+            <div class="window-header">
+                <span class="win-title">RUN_REPORT.txt</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content end-layout">
+                <div id="end-title" class="end-title">—</div>
+                <div id="end-subtitle" class="end-subtitle">—</div>
+                <div class="end-stats">
+                    <div class="end-stat">DATA EXFILTRATED <span id="end-data" class="end-stat-val">0</span> GB</div>
+                    <div class="end-stat">NODES COMPROMISED <span id="end-nodes" class="end-stat-val">0</span></div>
+                    <div class="end-stat">FINAL TIER <span id="end-tier" class="end-stat-val">—</span></div>
+                </div>
+                <button class="action-btn primary" onclick="startNewRun()">▶ NEW RUN</button>
+            </div>
+        </div>
+
+        <!-- ── TERMINAL WINDOW ──────────────────────────────── -->
+        <div id="win-terminal" class="window hidden"
+             data-closeable="true"
+             data-tab-label="TERMINAL"
+             data-default-rel-x="0.15"
+             data-default-rel-y="0.1"
+             style="top: 80px; left: 120px;">
+            <div class="window-header">
+                <span class="win-title">TERMINAL.sh</span>
+                <div class="win-controls">
+                    <button class="wc-btn wc-min" title="Minimise">−</button>
+                    <button class="wc-btn wc-max" title="Maximise">□</button>
+                    <button class="wc-btn wc-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="window-content terminal-layout">
+                <div id="terminal-output" class="terminal-output"></div>
+                <div class="terminal-prompt-row">
+                    <span class="terminal-prompt-glyph">root@<span id="terminal-host-label">SYS_ABYSSAL</span>:~#</span>
+                </div>
+                <div id="terminal-chips" class="terminal-chips"></div>
+                <div id="terminal-name-input-wrap" class="terminal-name-wrap hidden">
+                    <span class="terminal-prompt-glyph">NEW NAME &gt;</span>
+                    <input id="terminal-name-input" class="terminal-name-input"
+                           type="text" maxlength="12" autocomplete="off"
+                           spellcheck="false" autocorrect="off" autocapitalize="characters"
+                           placeholder="SYS_ABYSSAL" />
+                    <button class="terminal-name-confirm" id="terminal-name-confirm">APPLY</button>
+                    <button class="terminal-name-cancel"  id="terminal-name-cancel">✕</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RESET CONFIRM MODAL ─────────────────────────────── -->
+        <div id="win-reset-confirm" class="window modal-window hidden"
+             data-closeable="false"
+             style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="window-header">
+                <span class="win-title">⚠ CONFIRM_RESET.exe</span>
+                <div class="win-controls"></div>
+            </div>
+            <div class="window-content reset-confirm-layout">
+                <div class="reset-confirm-icon">21ba</div>
+                <div class="reset-confirm-msg">Abort current run?</div>
+                <div class="reset-confirm-sub">All progress, upgrades, and data will be wiped.<br>This cannot be undone.</div>
+                <div class="reset-confirm-btns">
+                    <button class="action-btn danger" onclick="powerResetConfirm()">⚠ CONFIRM RESET</button>
+                    <button class="action-btn" onclick="powerResetCancel()">✕ CANCEL</button>
+                </div>
+            </div>
+        </div>
+
+        <footer id="taskbar">
+            <div class="start-btn" onclick="openTerminal()">TERMINAL</div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
